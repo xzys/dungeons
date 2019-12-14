@@ -26,7 +26,6 @@ func _physics_process(delta):
 	var on_floor = is_on_floor()
 	var normal = (get_collision_normal() as Vector2)
 	var new_anim = anim
-	var new_facing = facing
 	
 	## inputs
 	var dir = 0
@@ -40,6 +39,7 @@ func _physics_process(delta):
 		if on_floor:
 			# on the ground, scale target speed with normal
 			target_speed = dir * SPEED * abs(normal.dot(Vector2.UP))
+			new_anim = "run"
 		else:
 			# in the air, you can move with AIR_SPEED
 			# but you keep your exising speed
@@ -49,29 +49,7 @@ func _physics_process(delta):
 		velocity.x = lerp(velocity.x, 0, FRICTION)
 	elif not on_floor:
 		velocity.x = lerp(velocity.x, 0, AIR_FRICTION)
-    	
-	## animations
-	if abs(velocity.x) > SIDING_CHANGE_SPEED:
-		if velocity.x > 0:
-			new_facing = 1
-		else:
-			new_facing = -1
-		if on_floor:
-			new_anim = "run"
 	
-	# scale run animation by speed
-	if anim == "run":
-		var anim_speed = max(MIN_RUN_ANIM_SPEED, MAX_RUN_ANIM_SPEED * abs(velocity.x / SPEED))
-		anim_player.set_speed_scale(anim_speed)
-	elif anim_player.get_speed_scale() != 1:
-		anim_player.set_speed_scale(1)
-		
-	# rotate player based on normal
-	if anim in ["run", "idle", "land"]:
-		sprites[anim].rotation = normal.angle() + PI/2
-	else:
-		sprites[anim].rotation = 0
-		
 	# jumping
 	var snap = Vector2.DOWN
 	if Input.is_action_just_pressed("jump") and on_floor:
@@ -97,6 +75,10 @@ func _physics_process(delta):
 	elif anim == "run" and abs(velocity.x) < SIDING_CHANGE_SPEED:
 		new_anim = "idle"
 	
+	var new_facing = calc_new_facing()
+	set_sprite(anim_player, new_anim, new_facing)
+	
 	velocity.y += GRAVITY * delta
 	velocity = move_and_slide_with_snap(velocity, snap, Vector2.UP, 5, 3, deg2rad(65))
-	set_sprite(anim_player, new_anim, new_facing)
+	
+	interact_animations(anim_player, normal, velocity, on_floor, MAX_RUN_ANIM_SPEED, MIN_RUN_ANIM_SPEED, SPEED)

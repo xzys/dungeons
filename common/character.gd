@@ -3,7 +3,9 @@ extends KinematicBody2D
 export (int) var GRAVITY = 2000
 export (float, 0, 1.0) var FRICTION = 0.10
 export (float, 0, 1.0) var AIR_FRICTION = 0.02
+
 export (int) var SIDING_CHANGE_SPEED = 10
+export (float) var ROTATION_CHANGE_SPEED = 0.5
 
 var sprites = {}
 var velocity = Vector2.ZERO
@@ -33,3 +35,32 @@ func get_collision_normal():
 	if get_slide_count() > 0:
 		normal = get_slide_collision(0).normal
 	return normal
+
+# get new facing based on velocity
+func calc_new_facing():
+	if abs(velocity.x) > SIDING_CHANGE_SPEED:
+		if velocity.x > 0:
+			return 1
+		else:
+			return -1
+	else:
+		return facing
+
+func interact_animations(anim_player, normal, velocity, on_floor, max_run_anim, min_run_anim, max_speed):
+	# scale run animation by speed
+	if anim == "run":
+		var anim_speed = max(min_run_anim, max_run_anim * abs(velocity.x / max_speed))
+		anim_player.set_speed_scale(anim_speed)
+	elif anim_player.get_speed_scale() != 1:
+		anim_player.set_speed_scale(1)
+		
+	# rotate player based on normal
+	var target_rot = 0
+	if on_floor:
+		target_rot = normal.angle() + PI/2
+	sprites[anim].rotation = lerp(sprites[anim].rotation, target_rot, ROTATION_CHANGE_SPEED)
+
+# NOTE: this should only be used from within _physics_delta
+func cast_ray(ray, mask):
+	var space_state = get_world_2d().direct_space_state
+	return space_state.intersect_ray(global_position, global_position + ray, [self], mask)

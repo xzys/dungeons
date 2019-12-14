@@ -575,5 +575,5 @@ tile_data = PoolIntArray( 65521, 0, 0, 42, 0, 0, 131057, 0, 0, 65578, 0, 0, 1965
 collision_layer = 2
 
 [node name="skeleton" parent="." instance=ExtResource( 3 )]
-position = Vector2( 599.925, 469.329 )
+position = Vector2( 420.356, 480.212 )
 collision_layer = 4
