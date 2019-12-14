@@ -49,21 +49,7 @@ func _physics_process(delta):
 		velocity.x = lerp(velocity.x, 0, FRICTION)
 	elif not on_floor:
 		velocity.x = lerp(velocity.x, 0, AIR_FRICTION)
-    
-	# falling
-	var snap = Vector2.DOWN
-	if Input.is_action_just_pressed("jump") and on_floor:
-		# jump impulse is upward force + side force scaled to current speed
-		# var jump_angle = dir * abs(velocity.x / SPEED) * Vector2(-normal.y, normal.x)
-		var jump_angle = min(1, (velocity.x / SPEED)) * Vector2(-normal.y, normal.x)
-		velocity = JUMP_SPEED * (normal + jump_angle)
-		snap = Vector2.ZERO
-		new_anim = "jump"
-	elif anim == "jump" and Input.is_action_pressed("jump"):
-		velocity.y += -JUMP_HOLD_SPEED * delta
-	elif anim == "jump" and velocity.y > 0:
-		new_anim = "fall"
-		
+    	
 	## animations
 	if abs(velocity.x) > SIDING_CHANGE_SPEED:
 		if velocity.x > 0:
@@ -79,13 +65,29 @@ func _physics_process(delta):
 		anim_player.set_speed_scale(anim_speed)
 	elif anim_player.get_speed_scale() != 1:
 		anim_player.set_speed_scale(1)
+		
 	# rotate player based on normal
 	if anim in ["run", "idle", "land"]:
 		sprites[anim].rotation = normal.angle() + PI/2
 	else:
 		sprites[anim].rotation = 0
+		
+	# jumping
+	var snap = Vector2.DOWN
+	if Input.is_action_just_pressed("jump") and on_floor:
+		# jump impulse is upward force + side force scaled to current speed
+		# var jump_angle = dir * abs(velocity.x / SPEED) * Vector2(-normal.y, normal.x)
+		var jump_angle = min(1, (velocity.x / SPEED)) * Vector2(-normal.y, normal.x)
+		velocity = JUMP_SPEED * (normal + jump_angle)
+		snap = Vector2.ZERO
+		new_anim = "jump"
+	elif anim == "jump" and Input.is_action_pressed("jump"):
+		velocity.y += -JUMP_HOLD_SPEED * delta
 	
-	if (anim == "run" or anim == "idle") and not on_floor:
+	# falling
+	if anim == "jump" and velocity.y > 0:
+		new_anim = "fall"
+	elif (anim == "run" or anim == "idle") and not on_floor:
 		new_anim = "fall"
 	# back to idle state
 	elif (anim == "jump" or anim == "fall") and on_floor:
@@ -98,4 +100,3 @@ func _physics_process(delta):
 	velocity.y += GRAVITY * delta
 	velocity = move_and_slide_with_snap(velocity, snap, Vector2.UP, 5, 3, deg2rad(65))
 	set_sprite(anim_player, new_anim, new_facing)
-	
