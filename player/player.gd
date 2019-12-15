@@ -13,7 +13,6 @@ onready var anim_player = $AnimationPlayer
 
 func _ready():
 	# what sprites to show during which animations
-	anim = "fall"
 	sprites = {
 		"idle": $SpriteIdle,
 		"run": $SpriteRun,
@@ -26,6 +25,7 @@ func _physics_process(delta):
 	var on_floor = is_on_floor()
 	var normal = (get_collision_normal() as Vector2)
 	var new_anim = anim
+	if new_anim == "": new_anim = "fall"
 	
 	## inputs
 	var dir = 0
@@ -70,15 +70,13 @@ func _physics_process(delta):
 	# back to idle state
 	elif (anim == "jump" or anim == "fall") and on_floor:
 		new_anim = "land"
-	elif anim == "land" and !anim_player.is_playing():
+	elif anim == "land" and not anim_player.is_playing():
 		new_anim = "idle"
 	elif anim == "run" and abs(velocity.x) < SIDING_CHANGE_SPEED:
 		new_anim = "idle"
 	
-	var new_facing = calc_new_facing()
-	set_sprite(anim_player, new_anim, new_facing)
 	
 	velocity.y += GRAVITY * delta
 	velocity = move_and_slide_with_snap(velocity, snap, Vector2.UP, 5, 3, deg2rad(65))
-	
+	set_sprite(anim_player, new_anim, calc_new_facing())
 	interact_animations(anim_player, normal, velocity, on_floor, MAX_RUN_ANIM_SPEED, MIN_RUN_ANIM_SPEED, SPEED)

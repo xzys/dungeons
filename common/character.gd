@@ -22,7 +22,8 @@ func set_sprite_visible(name):
 func set_sprite(anim_player, new_anim, new_facing):
 	if new_facing != facing or new_anim != anim:
 		facing = new_facing
-		sprites[new_anim].scale.x = new_facing
+		sprites[new_anim].scale.x = facing
+		sprites[new_anim].position.x = facing * abs(sprites[new_anim].position.x)
 
 	if new_anim != anim:
 		anim = new_anim

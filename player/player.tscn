@@ -114,10 +114,11 @@ hframes = 15
 frame = 5
 
 [node name="SpriteJumpAndFall" type="Sprite" parent="."]
+visible = false
 position = Vector2( 0.190002, 0.955994 )
 texture = ExtResource( 4 )
 hframes = 14
-frame = 8
+frame = 4
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 anims/fall = SubResource( 2 )
