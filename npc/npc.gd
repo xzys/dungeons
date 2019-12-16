@@ -15,6 +15,7 @@ func _ready():
 		"react": $SpriteReact,
 		"run": $SpriteRun,
 		"attack": $SpriteAttack,
+		"hit": $SpriteHit,
 		"dying": $SpriteDying,
 		}
 
@@ -23,26 +24,39 @@ const STATE_IDLE = 0
 const STATE_REACT = 1
 const STATE_WALKING = 2
 const STATE_ATTACK = 3
-const STATE_DYING = 4
+const STATE_HIT = 4
+const STATE_DYING = 5
 
 const anim_map = {
 	STATE_IDLE: "idle",
 	STATE_REACT: "react",
 	STATE_WALKING: "run",
 	STATE_ATTACK: "attack",
+	STATE_HIT: "hit",
 	STATE_DYING: "dying"
 	}
 
+export (int) var HEALTH = 30
+export (float) var PLAYER_ATTENTION = 5
+export (float) var SENSE_ATTACK = 10
+export (float) var SENSE_FRONT = 300
+export (float) var SENSE_BEHIND = 150
+
 var state = STATE_IDLE
+var health = HEALTH
 var mask_tiles = 1
 var mask_player = 2
 var dir = -1
 var attention = 0
 
-export (float) var PLAYER_ATTENTION = 5
-export (float) var SENSE_ATTACK = 10
-export (float) var SENSE_FRONT = 300
-export (float) var SENSE_BEHIND = 150
+
+func take_damage(damage):
+	if state != STATE_HIT and state != STATE_DYING:
+		state = STATE_HIT
+		velocity.x = 0
+		health -= damage
+		if health <= 0:
+			state = STATE_DYING
 
 func sense_player():
 	# if player in front of you start walking
@@ -91,6 +105,12 @@ func _physics_process(delta):
 	elif state == STATE_ATTACK:
 		if not anim_player.is_playing():
 			state = STATE_WALKING
+	elif state == STATE_HIT:
+		# very small chance that player will have escaped
+		# but chance exists :)
+		if not anim_player.is_playing():
+			state = STATE_WALKING
+			sense_player()
 			
 	new_anim = anim_map[state]
 	

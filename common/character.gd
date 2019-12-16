@@ -47,12 +47,12 @@ func calc_new_facing():
 	else:
 		return facing
 
-func interact_animations(anim_player, normal, velocity, on_floor, max_run_anim, min_run_anim, max_speed):
+func interact_animations(anim_player, normal, velocity, on_floor, max_run_anim, min_run_anim, max_speed, anim_exceptions=[]):
 	# scale run animation by speed
 	if anim == "run":
 		var anim_speed = max(min_run_anim, max_run_anim * abs(velocity.x / max_speed))
 		anim_player.set_speed_scale(anim_speed)
-	elif anim_player.get_speed_scale() != 1:
+	elif anim_player.get_speed_scale() != 1 and not anim in anim_exceptions:
 		anim_player.set_speed_scale(1)
 		
 	# rotate player based on normal
