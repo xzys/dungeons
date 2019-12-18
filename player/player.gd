@@ -9,7 +9,6 @@ export (float, 0, 1.0) var ACCELERATION = 0.10
 export (float) var MIN_RUN_ANIM_SPEED = 1
 export (float) var MAX_RUN_ANIM_SPEED = 2
 
-
 export (float) var ATTACK1_SPEED = 1.25
 export (int) var ATTACK1_DAMAGE = 10
 
@@ -21,17 +20,16 @@ onready var anim_player = $AnimationPlayer
 func _ready():
 	# what sprites to show during which animations
 	sprites = {
-		"idle": $SpriteIdle,
-		"run": $SpriteRun,
-		"jump": $SpriteJumpAndFall,
-		"fall": $SpriteJumpAndFall,
-		"land": $SpriteJumpAndFall,
-		"attack1": $SpriteAttack,
-		"attack2": $SpriteAttack,
-		"attack3": $SpriteAttack,
+		"idle": get_node("Sprite/SpriteIdle"),
+		"run": get_node("Sprite/SpriteRun"),
+		"jump": get_node("Sprite/SpriteJumpAndFall"),
+		"fall": get_node("Sprite/SpriteJumpAndFall"),
+		"land": get_node("Sprite/SpriteJumpAndFall"),
+		"attack1": get_node("Sprite/SpriteAttack"),
+		"attack2": get_node("Sprite/SpriteAttack"),
+		"attack3": get_node("Sprite/SpriteAttack"),
 		}
-
-var attack_anims = ["attack1", "attack2", "attack3"]
+	blocking_anims = ["attack1", "attack2", "attack3"]
 
 
 func _physics_process(delta):
@@ -43,7 +41,7 @@ func _physics_process(delta):
 	
 	## inputs
 	var dir = 0
-	if not anim in attack_anims:
+	if not anim in blocking_anims:
 		if Input.is_action_pressed("ui_right"):
 			dir += 1
 		if Input.is_action_pressed("ui_left"):
@@ -66,7 +64,7 @@ func _physics_process(delta):
 		velocity.x = lerp(velocity.x, 0, AIR_FRICTION)
 	
 	# jumping
-	if not anim in attack_anims:
+	if not anim in blocking_anims:
 		if on_floor and Input.is_action_just_pressed("jump"):
 			# jump impulse is upward force + side force scaled to current speed
 			# var jump_angle = dir * abs(velocity.x / SPEED) * Vector2(-normal.y, normal.x)
@@ -106,10 +104,16 @@ func _physics_process(delta):
 	velocity.y += GRAVITY * delta
 	velocity = move_and_slide_with_snap(velocity, snap, Vector2.UP, 5, 3, deg2rad(65))
 	set_sprite(anim_player, new_anim, calc_new_facing())
-	interact_animations(anim_player, normal, velocity, on_floor, MAX_RUN_ANIM_SPEED, MIN_RUN_ANIM_SPEED, SPEED, attack_anims)
+	interact_animations(anim_player, normal, velocity, on_floor, MAX_RUN_ANIM_SPEED, MIN_RUN_ANIM_SPEED, SPEED)
 
-func _on_attack1(body):
-	body.take_damage(ATTACK1_DAMAGE)
+func _on_attack1(area):
+	if area.is_in_group("hitboxes"):
+		var body = area.get_node("../../")
+		if body != self:
+			body.take_damage(ATTACK1_DAMAGE)
 
-func _on_attack2(body):
-	body.take_damage(ATTACK2_DAMAGE)
+func _on_attack2(area):
+	if area.is_in_group("hitboxes"):
+		var body = area.get_node("../../")
+		if body != self:
+			body.take_damage(ATTACK2_DAMAGE)

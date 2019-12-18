@@ -8,25 +8,9 @@ export (float) var MAX_RUN_ANIM_SPEED = 1.5
 
 onready var anim_player = $AnimationPlayer
 
-func _ready():
-	# what sprites to show during which animations
-	sprites = {
-		"idle": $SpriteIdle,
-		"react": $SpriteReact,
-		"run": $SpriteRun,
-		"attack": $SpriteAttack,
-		"hit": $SpriteHit,
-		"dying": $SpriteDying,
-		}
+# ---
 
-
-const STATE_IDLE = 0
-const STATE_REACT = 1
-const STATE_WALKING = 2
-const STATE_ATTACK = 3
-const STATE_HIT = 4
-const STATE_DYING = 5
-
+enum {STATE_IDLE, STATE_REACT, STATE_WALKING, STATE_ATTACK, STATE_HIT, STATE_DYING}
 const anim_map = {
 	STATE_IDLE: "idle",
 	STATE_REACT: "react",
@@ -49,6 +33,17 @@ var mask_player = 2
 var dir = -1
 var attention = 0
 
+func _ready():
+	# what sprites to show during which animations
+	sprites = {
+		"idle": get_node("Sprite/SpriteIdle"),
+		"react": get_node("Sprite/SpriteReact"),
+		"run": get_node("Sprite/SpriteRun"),
+		"attack": get_node("Sprite/SpriteAttack"),
+		"hit": get_node("Sprite/SpriteHit"),
+		"dying": get_node("Sprite/SpriteDying"),
+		}
+	blocking_anims = ["attack", "hit", "dying"]
 
 func take_damage(damage):
 	if state != STATE_HIT and state != STATE_DYING:
@@ -106,8 +101,6 @@ func _physics_process(delta):
 		if not anim_player.is_playing():
 			state = STATE_WALKING
 	elif state == STATE_HIT:
-		# very small chance that player will have escaped
-		# but chance exists :)
 		if not anim_player.is_playing():
 			state = STATE_WALKING
 			sense_player()

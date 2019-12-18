@@ -7,11 +7,13 @@ export (float, 0, 1.0) var AIR_FRICTION = 0.02
 export (int) var SIDING_CHANGE_SPEED = 10
 export (float) var ROTATION_CHANGE_SPEED = 0.5
 
+onready var main_sprite = $Sprite
+
 var sprites = {}
+var blocking_anims = []
 var velocity = Vector2.ZERO
 var anim = ""
 var facing = 1
-
 
 func set_sprite_visible(name):
 	for k in sprites.keys():
@@ -22,8 +24,9 @@ func set_sprite_visible(name):
 func set_sprite(anim_player, new_anim, new_facing):
 	if new_facing != facing or new_anim != anim:
 		facing = new_facing
-		sprites[new_anim].scale.x = facing
-		sprites[new_anim].position.x = facing * abs(sprites[new_anim].position.x)
+		main_sprite.scale.x = facing
+		# sprites[new_anim].scale.x = facing
+		# sprites[new_anim].position.x = facing * abs(sprites[new_anim].position.x)
 
 	if new_anim != anim:
 		anim = new_anim
@@ -47,12 +50,12 @@ func calc_new_facing():
 	else:
 		return facing
 
-func interact_animations(anim_player, normal, velocity, on_floor, max_run_anim, min_run_anim, max_speed, anim_exceptions=[]):
+func interact_animations(anim_player, normal, velocity, on_floor, max_run_anim, min_run_anim, max_speed):
 	# scale run animation by speed
 	if anim == "run":
 		var anim_speed = max(min_run_anim, max_run_anim * abs(velocity.x / max_speed))
 		anim_player.set_speed_scale(anim_speed)
-	elif anim_player.get_speed_scale() != 1 and not anim in anim_exceptions:
+	elif anim_player.get_speed_scale() != 1 and not anim in blocking_anims:
 		anim_player.set_speed_scale(1)
 		
 	# rotate player based on normal

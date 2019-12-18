@@ -9,11 +9,26 @@
 [sub_resource type="CircleShape2D" id=1]
 radius = 15.808
 
+[sub_resource type="RectangleShape2D" id=10]
+extents = Vector2( 18.5918, 3.31554 )
+
+[sub_resource type="RectangleShape2D" id=11]
+extents = Vector2( 16.7878, 2.7885 )
+
+[sub_resource type="CircleShape2D" id=12]
+radius = 16.2611
+
+[sub_resource type="RectangleShape2D" id=13]
+extents = Vector2( 7.82809, 10.6941 )
+
+[sub_resource type="CircleShape2D" id=14]
+radius = 4.26729
+
 [sub_resource type="Animation" id=3]
 resource_name = "attack1"
 length = 0.8
 tracks/0/type = "value"
-tracks/0/path = NodePath("SpriteAttack:frame")
+tracks/0/path = NodePath("Sprite/SpriteAttack:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/imported = false
@@ -25,7 +40,7 @@ tracks/0/keys = {
 "values": [ 2, 3, 4, 5, 7, 4, 3, 2 ]
 }
 tracks/1/type = "value"
-tracks/1/path = NodePath("Attack1Hitbox/CollisionShape2D:disabled")
+tracks/1/path = NodePath("Sprite/Attack1Hitbox/CollisionShape2D:disabled")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/imported = false
@@ -41,7 +56,7 @@ tracks/1/keys = {
 resource_name = "attack2"
 length = 0.8
 tracks/0/type = "value"
-tracks/0/path = NodePath("SpriteAttack:frame")
+tracks/0/path = NodePath("Sprite/SpriteAttack:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/imported = false
@@ -53,7 +68,7 @@ tracks/0/keys = {
 "values": [ 7, 8, 9, 10, 11, 12 ]
 }
 tracks/1/type = "value"
-tracks/1/path = NodePath("Attack2Hitbox/CollisionShape2D:disabled")
+tracks/1/path = NodePath("Sprite/Attack2Hitbox/CollisionShape2D:disabled")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/imported = false
@@ -65,7 +80,7 @@ tracks/1/keys = {
 "values": [ true, false, true ]
 }
 tracks/2/type = "value"
-tracks/2/path = NodePath("Attack2Hitbox/CollisionShape2D2:disabled")
+tracks/2/path = NodePath("Sprite/Attack2Hitbox/CollisionShape2D2:disabled")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/imported = false
@@ -81,7 +96,7 @@ tracks/2/keys = {
 resource_name = "attack3"
 loop = true
 tracks/0/type = "value"
-tracks/0/path = NodePath("SpriteAttack:frame")
+tracks/0/path = NodePath("Sprite/SpriteAttack:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/imported = false
@@ -108,7 +123,7 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=5]
 length = 0.4
 tracks/0/type = "value"
-tracks/0/path = NodePath("SpriteJumpAndFall:frame")
+tracks/0/path = NodePath("Sprite/SpriteJumpAndFall:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/imported = false
@@ -124,7 +139,7 @@ tracks/0/keys = {
 length = 1.5
 loop = true
 tracks/0/type = "value"
-tracks/0/path = NodePath("SpriteIdle:frame")
+tracks/0/path = NodePath("Sprite/SpriteIdle:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/imported = false
@@ -139,7 +154,7 @@ tracks/0/keys = {
 [sub_resource type="Animation" id=7]
 length = 0.3
 tracks/0/type = "value"
-tracks/0/path = NodePath("SpriteJumpAndFall:frame")
+tracks/0/path = NodePath("Sprite/SpriteJumpAndFall:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/imported = false
@@ -154,7 +169,7 @@ tracks/0/keys = {
 [sub_resource type="Animation" id=8]
 length = 0.5
 tracks/0/type = "value"
-tracks/0/path = NodePath("SpriteJumpAndFall:frame")
+tracks/0/path = NodePath("Sprite/SpriteJumpAndFall:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/imported = false
@@ -170,7 +185,7 @@ tracks/0/keys = {
 length = 0.8
 loop = true
 tracks/0/type = "value"
-tracks/0/path = NodePath("SpriteRun:frame")
+tracks/0/path = NodePath("Sprite/SpriteRun:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/imported = false
@@ -181,21 +196,6 @@ tracks/0/keys = {
 "update": 1,
 "values": [ 0, 1, 2, 3, 4, 5, 6, 7 ]
 }
-
-[sub_resource type="RectangleShape2D" id=10]
-extents = Vector2( 18.5918, 3.31554 )
-
-[sub_resource type="RectangleShape2D" id=11]
-extents = Vector2( 16.7878, 2.7885 )
-
-[sub_resource type="CircleShape2D" id=12]
-radius = 16.2611
-
-[sub_resource type="RectangleShape2D" id=13]
-extents = Vector2( 7.82809, 10.6941 )
-
-[sub_resource type="CircleShape2D" id=14]
-radius = 4.26729
 
 [node name="player" type="KinematicBody2D"]
 script = ExtResource( 1 )
@@ -208,32 +208,82 @@ shape = SubResource( 1 )
 position = Vector2( 0.0910034, 0.85199 )
 current = true
 
-[node name="SpriteIdle" type="Sprite" parent="."]
-visible = false
+[node name="Sprite" type="Sprite" parent="."]
+
+[node name="SpriteIdle" type="Sprite" parent="Sprite"]
 position = Vector2( 0.0440063, 0.794006 )
 texture = ExtResource( 2 )
 hframes = 15
 frame = 7
 
-[node name="SpriteRun" type="Sprite" parent="."]
+[node name="SpriteRun" type="Sprite" parent="Sprite"]
 visible = false
 position = Vector2( 0.00396729, 0.808014 )
 texture = ExtResource( 3 )
 hframes = 8
 frame = 7
 
-[node name="SpriteJumpAndFall" type="Sprite" parent="."]
+[node name="SpriteJumpAndFall" type="Sprite" parent="Sprite"]
 visible = false
 position = Vector2( 0.190002, 0.955994 )
 texture = ExtResource( 4 )
 hframes = 14
 frame = 4
 
-[node name="SpriteAttack" type="Sprite" parent="."]
+[node name="SpriteAttack" type="Sprite" parent="Sprite"]
+visible = false
 position = Vector2( 8.01102, 0.75103 )
 texture = ExtResource( 5 )
 hframes = 22
-frame = 5
+frame = 2
+
+[node name="Attack1Hitbox" type="Area2D" parent="Sprite"]
+collision_layer = 0
+collision_mask = 8
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite/Attack1Hitbox"]
+position = Vector2( 13.5586, -5.0069 )
+shape = SubResource( 10 )
+disabled = true
+
+[node name="Attack2Hitbox" type="Area2D" parent="Sprite"]
+visible = false
+collision_layer = 0
+collision_mask = 8
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite/Attack2Hitbox"]
+position = Vector2( -0.790558, -17.3924 )
+shape = SubResource( 11 )
+disabled = true
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Sprite/Attack2Hitbox"]
+position = Vector2( 15.0207, -2.6352 )
+shape = SubResource( 12 )
+disabled = true
+
+[node name="BodyHitbox" type="Area2D" parent="Sprite" groups=[
+"hitboxes",
+]]
+editor/display_folded = true
+visible = false
+collision_layer = 8
+collision_mask = 8
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite/BodyHitbox"]
+position = Vector2( 1.05409, 2.37169 )
+shape = SubResource( 13 )
+
+[node name="HeadHitbox" type="Area2D" parent="Sprite" groups=[
+"hitboxes",
+]]
+editor/display_folded = true
+visible = false
+collision_layer = 8
+collision_mask = 8
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite/HeadHitbox"]
+position = Vector2( 4.5098, -12.4242 )
+shape = SubResource( 14 )
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 anims/attack1 = SubResource( 3 )
@@ -244,42 +294,5 @@ anims/idle = SubResource( 6 )
 anims/jump = SubResource( 7 )
 anims/land = SubResource( 8 )
 anims/run = SubResource( 9 )
-
-[node name="Attack1Hitbox" type="Area2D" parent="."]
-collision_layer = 0
-collision_mask = 4
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Attack1Hitbox"]
-position = Vector2( 13.5586, -5.0069 )
-shape = SubResource( 10 )
-
-[node name="Attack2Hitbox" type="Area2D" parent="."]
-visible = false
-collision_layer = 0
-collision_mask = 4
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Attack2Hitbox"]
-position = Vector2( -0.790558, -17.3924 )
-shape = SubResource( 11 )
-disabled = true
-
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="Attack2Hitbox"]
-position = Vector2( 15.0207, -2.6352 )
-shape = SubResource( 12 )
-disabled = true
-
-[node name="BodyHurtbox" type="Area2D" parent="."]
-visible = false
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="BodyHurtbox"]
-position = Vector2( 1.05409, 2.37169 )
-shape = SubResource( 13 )
-
-[node name="HeadHurtbox" type="Area2D" parent="."]
-visible = false
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="HeadHurtbox"]
-position = Vector2( 4.5098, -12.4242 )
-shape = SubResource( 14 )
-[connection signal="body_entered" from="Attack1Hitbox" to="." method="_on_attack1"]
-[connection signal="body_entered" from="Attack2Hitbox" to="." method="_on_attack2"]
+[connection signal="area_entered" from="Sprite/Attack1Hitbox" to="." method="_on_attack1"]
+[connection signal="area_entered" from="Sprite/Attack2Hitbox" to="." method="_on_attack2"]
