@@ -14,8 +14,34 @@ export (float) var ATTACK1_SPEED = 1.25
 export (int) var ATTACK1_DAMAGE = 10
 export (float) var ATTACK2_SPEED = 1
 export (int) var ATTACK2_DAMAGE = 20
+export (int) var ROLL_SPEED = 400
+export (int) var ROLL_ANIM_SCALE = 2
+
+export (float) var SHIELD_TIME = 3
 
 onready var anim_player = $AnimationPlayer
+
+enum {
+	STATE_IDLE, STATE_RUN, STATE_JUMP, STATE_FALL, STATE_LAND, 
+	STATE_ATTACK1, STATE_ATTACK2, STATE_ROLL, STATE_SHIELD, STATE_UNSHIELD,
+	STATE_HIT, STATE_DYING
+	}
+const anim_map = {
+	STATE_IDLE: "idle",
+	STATE_RUN: "run",
+	STATE_JUMP: "jump",
+	STATE_FALL: "fall",
+	STATE_LAND: "land",
+	STATE_ATTACK1: "attack1",
+	STATE_ATTACK2: "attack2",
+	STATE_SHIELD: "shield",
+	STATE_UNSHIELD: "unshield",
+	STATE_ROLL: "roll",
+	STATE_HIT: "hit",
+	STATE_DYING: "dying"
+	}
+
+var shield_cooldown = SHIELD_TIME
 
 func _ready():
 	# what sprites to show during which animations
@@ -28,28 +54,42 @@ func _ready():
 		"attack1": get_node("Sprite/SpriteAttack"),
 		"attack2": get_node("Sprite/SpriteAttack"),
 		"attack3": get_node("Sprite/SpriteAttack"),
+		"shield": get_node("Sprite/SpriteShield"),
+		"unshield": get_node("Sprite/SpriteShield"),
+		"roll": get_node("Sprite/SpriteRoll"),
 		"hit": get_node("Sprite/SpriteRoll"),
 		"dying": get_node("Sprite/SpriteDying"),
 		}
-	blocking_states = [STATE_ATTACK1, STATE_ATTACK2, STATE_HIT, STATE_DYING]
+	blocking_states = [
+		STATE_ATTACK1, STATE_ATTACK2, STATE_ROLL, STATE_UNSHIELD, STATE_ROLL,
+		STATE_HIT, STATE_DYING]
 	state = STATE_IDLE
 	health = HEALTH
 
-enum {
-	STATE_IDLE, STATE_RUN, STATE_JUMP, STATE_FALL, STATE_LAND, 
-	STATE_ATTACK1, STATE_ATTACK2, STATE_HIT, STATE_DYING
-	}
-const anim_map = {
-	STATE_IDLE: "idle",
-	STATE_RUN: "run",
-	STATE_JUMP: "jump",
-	STATE_FALL: "fall",
-	STATE_LAND: "land",
-	STATE_ATTACK1: "attack1",
-	STATE_ATTACK2: "attack2",
-	STATE_HIT: "hit",
-	STATE_DYING: "dying"
-	}
+func _on_attack1(area):
+	if area.is_in_group("hitboxes"):
+		var body = area.get_node("../../")
+		if body != self:
+			body.take_damage(ATTACK1_DAMAGE)
+
+func _on_attack2(area):
+	if area.is_in_group("hitboxes"):
+		var body = area.get_node("../../")
+		if body != self:
+			body.take_damage(ATTACK2_DAMAGE)
+
+func take_damage(damage):
+	if state == STATE_HIT or state == STATE_DYING:
+		pass
+	if state == STATE_ROLL or state == STATE_SHIELD:
+		print('player blocks ', damage)
+	else:
+		print('player takes ', damage)
+		state = STATE_HIT
+		velocity.x = 0
+		health -= damage
+		if health <= 0:
+			state = STATE_DYING
 
 func handle_inputs(on_floor, normal, delta):
 	# running
@@ -76,6 +116,9 @@ func handle_inputs(on_floor, normal, delta):
 	elif not on_floor:
 		velocity.x = lerp(velocity.x, 0, AIR_FRICTION)
 	
+	if state == STATE_ROLL:
+		velocity.x += facing * ROLL_SPEED * delta
+	
 	# jumping
 	if not state in blocking_states:
 		if on_floor and Input.is_action_just_pressed("jump"):
@@ -94,28 +137,17 @@ func handle_inputs(on_floor, normal, delta):
 		elif on_floor and Input.is_action_just_pressed("attack2"):
 			state = STATE_ATTACK2
 			anim_player.set_speed_scale(ATTACK2_SPEED)
-
-func _on_attack1(area):
-	if area.is_in_group("hitboxes"):
-		var body = area.get_node("../../")
-		if body != self:
-			print('attack1')
-			body.take_damage(ATTACK1_DAMAGE)
-
-func _on_attack2(area):
-	if area.is_in_group("hitboxes"):
-		var body = area.get_node("../../")
-		if body != self:
-			body.take_damage(ATTACK2_DAMAGE)
-
-func take_damage(damage):
-	if state != STATE_HIT and state != STATE_DYING:
-		print('player takes ', damage)
-		state = STATE_HIT
-		velocity.x = 0
-		health -= damage
-		if health <= 0:
-			state = STATE_DYING
+		# shield
+		elif on_floor and Input.is_action_just_pressed("ui_down"):
+			if dir == 0 and shield_cooldown > 0:
+				state = STATE_SHIELD
+			elif dir != 0:
+				state = STATE_ROLL
+				anim_player.set_speed_scale(ROLL_ANIM_SCALE)
+		elif state == STATE_SHIELD and Input.is_action_pressed("ui_down") and shield_cooldown > 0:
+			shield_cooldown -= delta
+		elif state == STATE_SHIELD and (Input.is_action_just_released("ui_down") or shield_cooldown <= 0):
+			state = STATE_UNSHIELD
 
 func _physics_process(delta):
 	var on_floor = is_on_floor()
@@ -130,6 +162,10 @@ func _physics_process(delta):
 	elif state == STATE_ATTACK1 and not anim_player.is_playing():
 		state = STATE_IDLE
 	elif state == STATE_ATTACK2 and not anim_player.is_playing():
+		state = STATE_IDLE
+	elif state == STATE_UNSHIELD and not anim_player.is_playing():
+		state = STATE_IDLE
+	elif state == STATE_ROLL and not anim_player.is_playing():
 		state = STATE_IDLE
 	# falling
 	elif state == STATE_JUMP and velocity.y > 0:
@@ -146,6 +182,10 @@ func _physics_process(delta):
 	elif state == STATE_HIT:
 		if not anim_player.is_playing():
 			state = STATE_IDLE
+	
+	# recharge shield
+	if state != STATE_SHIELD and shield_cooldown < SHIELD_TIME:
+		shield_cooldown += delta
 	
 	var new_anim = anim_map[state]
 	var snap = Vector2.DOWN

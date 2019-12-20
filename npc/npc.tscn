@@ -206,6 +206,8 @@ hframes = 8
 frame = 7
 
 [node name="AttackHitbox" type="Area2D" parent="Sprite"]
+editor/display_folded = true
+visible = false
 collision_layer = 0
 collision_mask = 8
 
@@ -229,7 +231,6 @@ disabled = true
 "hitboxes",
 ]]
 editor/display_folded = true
-visible = false
 collision_layer = 8
 collision_mask = 0
 
