@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=2]
+[gd_scene load_steps=19 format=2]
 
 [ext_resource path="res://npc/npc.gd" type="Script" id=1]
 [ext_resource path="res://npc/skeleton/Skeleton Idle.png" type="Texture" id=2]
@@ -10,6 +10,15 @@
 
 [sub_resource type="CircleShape2D" id=8]
 radius = 12.6714
+
+[sub_resource type="RectangleShape2D" id=10]
+extents = Vector2( 4.67114, 11.0101 )
+
+[sub_resource type="RectangleShape2D" id=11]
+extents = Vector2( 4.62562, 9.12926 )
+
+[sub_resource type="RectangleShape2D" id=12]
+extents = Vector2( 11.8223, 2.93223 )
 
 [sub_resource type="RectangleShape2D" id=9]
 extents = Vector2( 6.45711, 12.1773 )
@@ -28,6 +37,42 @@ tracks/0/keys = {
 "transitions": PoolRealArray( 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ),
 "update": 1,
 "values": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17 ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Sprite/AttackHitbox/CollisionShape2D:disabled")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.7, 0.8 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 1,
+"values": [ true, false, true ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Sprite/AttackHitbox/CollisionShape2D2:disabled")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0, 0.7, 0.8 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 1,
+"values": [ true, false, true ]
+}
+tracks/3/type = "value"
+tracks/3/path = NodePath("Sprite/AttackHitbox/CollisionShape2D3:disabled")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"times": PoolRealArray( 0, 0.7, 0.8 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 1,
+"values": [ true, false, true ]
 }
 
 [sub_resource type="Animation" id=6]
@@ -120,7 +165,6 @@ shape = SubResource( 8 )
 [node name="Sprite" type="Sprite" parent="."]
 
 [node name="SpriteIdle" type="Sprite" parent="Sprite"]
-visible = false
 position = Vector2( 3.8522, -0.237236 )
 texture = ExtResource( 2 )
 hframes = 11
@@ -148,10 +192,11 @@ hframes = 4
 frame = 2
 
 [node name="SpriteAttack" type="Sprite" parent="Sprite"]
+visible = false
 position = Vector2( 10.8263, -2.24351 )
 texture = ExtResource( 6 )
 hframes = 18
-frame = 17
+frame = 8
 
 [node name="SpriteHit" type="Sprite" parent="Sprite"]
 visible = false
@@ -161,15 +206,30 @@ hframes = 8
 frame = 7
 
 [node name="AttackHitbox" type="Area2D" parent="Sprite"]
-visible = false
 collision_layer = 0
 collision_mask = 8
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite/AttackHitbox"]
+position = Vector2( 25.7855, 5.6361 )
+shape = SubResource( 10 )
+disabled = true
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Sprite/AttackHitbox"]
+position = Vector2( 20.9475, -8.86735 )
+rotation = 2.40681
+shape = SubResource( 11 )
+disabled = true
+
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="Sprite/AttackHitbox"]
+position = Vector2( 6.29711, -15.807 )
+shape = SubResource( 12 )
+disabled = true
 
 [node name="BodyHitbox" type="Area2D" parent="Sprite" groups=[
 "hitboxes",
 ]]
+editor/display_folded = true
+visible = false
 collision_layer = 8
 collision_mask = 0
 
@@ -186,3 +246,4 @@ anims/hit = SubResource( 7 )
 anims/idle = SubResource( 3 )
 anims/react = SubResource( 4 )
 anims/run = SubResource( 5 )
+[connection signal="area_entered" from="Sprite/AttackHitbox" to="." method="_on_attack1"]

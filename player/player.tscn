@@ -1,10 +1,13 @@
-[gd_scene load_steps=20 format=2]
+[gd_scene load_steps=26 format=2]
 
 [ext_resource path="res://player/player.gd" type="Script" id=1]
 [ext_resource path="res://player/knight/noBKG_KnightIdle_strip.png" type="Texture" id=2]
 [ext_resource path="res://player/knight/noBKG_KnightRun_strip.png" type="Texture" id=3]
 [ext_resource path="res://player/knight/noBKG_KnightJumpAndFall_strip.png" type="Texture" id=4]
 [ext_resource path="res://player/knight/noBKG_KnightAttack_strip.png" type="Texture" id=5]
+[ext_resource path="res://player/knight/noBKG_KnightDeath_strip.png" type="Texture" id=6]
+[ext_resource path="res://player/knight/noBKG_KnightRoll_strip.png" type="Texture" id=7]
+[ext_resource path="res://player/knight/noBKG_KnightShield_strip.png" type="Texture" id=8]
 
 [sub_resource type="CircleShape2D" id=1]
 radius = 15.808
@@ -120,6 +123,22 @@ tracks/1/keys = {
 "values": [ Vector2( 0, -2.211 ), Vector2( 14.1567, -2.211 ), Vector2( 25, -2.211 ), Vector2( 25, -2.211 ) ]
 }
 
+[sub_resource type="Animation" id=15]
+resource_name = "dying"
+length = 1.5
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite/SpriteDying:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4 ),
+"transitions": PoolRealArray( 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ),
+"update": 1,
+"values": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 ]
+}
+
 [sub_resource type="Animation" id=5]
 length = 0.4
 tracks/0/type = "value"
@@ -133,6 +152,22 @@ tracks/0/keys = {
 "transitions": PoolRealArray( 1, 1, 1, 1 ),
 "update": 1,
 "values": [ 5, 6, 7, 8 ]
+}
+
+[sub_resource type="Animation" id=17]
+resource_name = "hit"
+length = 0.7
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite/SpriteRoll:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6 ),
+"transitions": PoolRealArray( 1, 1, 1, 1, 1, 1, 1 ),
+"update": 1,
+"values": [ 15, 9, 10, 11, 12, 13, 14 ]
 }
 
 [sub_resource type="Animation" id=6]
@@ -181,6 +216,22 @@ tracks/0/keys = {
 "values": [ 9, 10, 11, 12, 13 ]
 }
 
+[sub_resource type="Animation" id=16]
+resource_name = "roll"
+length = 1.5
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite/SpriteRoll:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4 ),
+"transitions": PoolRealArray( 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ),
+"update": 1,
+"values": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 ]
+}
+
 [sub_resource type="Animation" id=9]
 length = 0.8
 loop = true
@@ -211,10 +262,10 @@ current = true
 [node name="Sprite" type="Sprite" parent="."]
 
 [node name="SpriteIdle" type="Sprite" parent="Sprite"]
+visible = false
 position = Vector2( 0.0440063, 0.794006 )
 texture = ExtResource( 2 )
 hframes = 15
-frame = 7
 
 [node name="SpriteRun" type="Sprite" parent="Sprite"]
 visible = false
@@ -235,18 +286,42 @@ visible = false
 position = Vector2( 8.01102, 0.75103 )
 texture = ExtResource( 5 )
 hframes = 22
-frame = 2
+frame = 12
+
+[node name="SpriteDying" type="Sprite" parent="Sprite"]
+visible = false
+position = Vector2( -0.17482, 1.04895 )
+texture = ExtResource( 6 )
+hframes = 15
+frame = 14
+
+[node name="SpriteRoll" type="Sprite" parent="Sprite"]
+visible = false
+position = Vector2( 1.08257, 0.602119 )
+texture = ExtResource( 7 )
+hframes = 16
+frame = 15
+
+[node name="SpriteShield" type="Sprite" parent="Sprite"]
+visible = false
+position = Vector2( 0, 0.996502 )
+texture = ExtResource( 8 )
+hframes = 7
 
 [node name="Attack1Hitbox" type="Area2D" parent="Sprite"]
+editor/display_folded = true
+visible = false
 collision_layer = 0
 collision_mask = 8
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite/Attack1Hitbox"]
+visible = false
 position = Vector2( 13.5586, -5.0069 )
 shape = SubResource( 10 )
 disabled = true
 
 [node name="Attack2Hitbox" type="Area2D" parent="Sprite"]
+editor/display_folded = true
 visible = false
 collision_layer = 0
 collision_mask = 8
@@ -289,10 +364,13 @@ shape = SubResource( 14 )
 anims/attack1 = SubResource( 3 )
 anims/attack2 = SubResource( 2 )
 anims/attack3 = SubResource( 4 )
+anims/dying = SubResource( 15 )
 anims/fall = SubResource( 5 )
+anims/hit = SubResource( 17 )
 anims/idle = SubResource( 6 )
 anims/jump = SubResource( 7 )
 anims/land = SubResource( 8 )
+anims/roll = SubResource( 16 )
 anims/run = SubResource( 9 )
 [connection signal="area_entered" from="Sprite/Attack1Hitbox" to="." method="_on_attack1"]
 [connection signal="area_entered" from="Sprite/Attack2Hitbox" to="." method="_on_attack2"]

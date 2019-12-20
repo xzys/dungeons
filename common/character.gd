@@ -10,10 +10,12 @@ export (float) var ROTATION_CHANGE_SPEED = 0.5
 onready var main_sprite = $Sprite
 
 var sprites = {}
-var blocking_anims = []
+var blocking_states = []
 var velocity = Vector2.ZERO
 var anim = ""
 var facing = 1
+var state = -1
+var health = 0
 
 func set_sprite_visible(name):
 	for k in sprites.keys():
@@ -55,14 +57,14 @@ func interact_animations(anim_player, normal, velocity, on_floor, max_run_anim, 
 	if anim == "run":
 		var anim_speed = max(min_run_anim, max_run_anim * abs(velocity.x / max_speed))
 		anim_player.set_speed_scale(anim_speed)
-	elif anim_player.get_speed_scale() != 1 and not anim in blocking_anims:
+	elif anim_player.get_speed_scale() != 1 and not state in blocking_states:
 		anim_player.set_speed_scale(1)
 		
 	# rotate player based on normal
 	var target_rot = 0
 	if on_floor:
 		target_rot = normal.angle() + PI/2
-	sprites[anim].rotation = lerp(sprites[anim].rotation, target_rot, ROTATION_CHANGE_SPEED)
+	main_sprite.rotation = lerp(sprites[anim].rotation, target_rot, ROTATION_CHANGE_SPEED)
 
 # NOTE: this should only be used from within _physics_delta
 func cast_ray(ray, mask):

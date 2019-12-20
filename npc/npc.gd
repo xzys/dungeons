@@ -26,8 +26,8 @@ export (float) var SENSE_ATTACK = 10
 export (float) var SENSE_FRONT = 300
 export (float) var SENSE_BEHIND = 150
 
-var state = STATE_IDLE
-var health = HEALTH
+export (int) var ATTACK1_DAMAGE = 20
+
 var mask_tiles = 1
 var mask_player = 2
 var dir = -1
@@ -43,10 +43,20 @@ func _ready():
 		"hit": get_node("Sprite/SpriteHit"),
 		"dying": get_node("Sprite/SpriteDying"),
 		}
-	blocking_anims = ["attack", "hit", "dying"]
+	blocking_states = [STATE_ATTACK, STATE_HIT, STATE_DYING]
+	state = STATE_IDLE
+	health = HEALTH
+
+func _on_attack1(area):
+	if area.is_in_group("hitboxes"):
+		var body = area.get_node("../../")
+		if body != self:
+			print('attack1 hits')
+			body.take_damage(ATTACK1_DAMAGE)
 
 func take_damage(damage):
 	if state != STATE_HIT and state != STATE_DYING:
+		print('skeleton takes ', damage)
 		state = STATE_HIT
 		velocity.x = 0
 		health -= damage
@@ -69,10 +79,8 @@ func sense_player():
 			state = STATE_REACT
 
 func _physics_process(delta):
-	var new_anim = anim
 	var on_floor = is_on_floor()
 	var normal = (get_collision_normal() as Vector2)
-	var start_state = state
 	
 	if state == STATE_IDLE:
 		sense_player()
@@ -105,7 +113,7 @@ func _physics_process(delta):
 			state = STATE_WALKING
 			sense_player()
 			
-	new_anim = anim_map[state]
+	var new_anim = anim_map[state]
 	
 	var snap = Vector2.DOWN
 	velocity.y += GRAVITY * delta
