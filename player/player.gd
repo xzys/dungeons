@@ -70,26 +70,32 @@ func _on_attack1(area):
 	if area.is_in_group("hitboxes"):
 		var body = area.get_node("../../")
 		if body != self:
-			body.take_damage(ATTACK1_DAMAGE)
+			body.take_damage(self, ATTACK1_DAMAGE)
 
 func _on_attack2(area):
 	if area.is_in_group("hitboxes"):
 		var body = area.get_node("../../")
 		if body != self:
-			body.take_damage(ATTACK2_DAMAGE)
+			body.take_damage(self, ATTACK2_DAMAGE)
 
-func take_damage(damage):
+func take_damage(body, damage):
 	if state == STATE_HIT or state == STATE_DYING:
-		pass
-	if state == STATE_ROLL or state == STATE_SHIELD:
-		print('player blocks ', damage)
-	else:
-		print('player takes ', damage)
-		state = STATE_HIT
-		velocity.x = 0
-		health -= damage
-		if health <= 0:
-			state = STATE_DYING
+		return
+	if state == STATE_ROLL:
+		print('player blocks by roll ', damage)
+		return
+	if state == STATE_SHIELD:
+		var d = self.position.x - body.position.x
+		if (d > 0 and facing == -1) or (d < 0 and facing == 1):
+			print('player blocks by shield ', damage)
+			return
+	
+	print('player takes ', damage)
+	state = STATE_HIT
+	velocity.x = 0
+	health -= damage
+	if health <= 0:
+		state = STATE_DYING
 
 func handle_inputs(on_floor, normal, delta):
 	# running

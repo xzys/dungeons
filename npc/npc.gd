@@ -51,10 +51,9 @@ func _on_attack1(area):
 	if area.is_in_group("hitboxes"):
 		var body = area.get_node("../../")
 		if body != self:
-			print('attack1 hits')
-			body.take_damage(ATTACK1_DAMAGE)
+			body.take_damage(self, ATTACK1_DAMAGE)
 
-func take_damage(damage):
+func take_damage(body, damage):
 	if state != STATE_HIT and state != STATE_DYING:
 		print('skeleton takes ', damage)
 		state = STATE_HIT
