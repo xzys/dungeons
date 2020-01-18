@@ -131,7 +131,10 @@ func handle_inputs(on_floor, normal, delta):
 			# jump impulse is upward force + side force scaled to current speed
 			# var jump_angle = dir * abs(velocity.x / SPEED) * Vector2(-normal.y, normal.x)
 			var jump_angle = min(1, (velocity.x / SPEED)) * Vector2(-normal.y, normal.x)
-			velocity = JUMP_SPEED * (normal + jump_angle)
+			var jump_up = Vector2.UP
+			if dir == 0:
+				jump_up = normal
+			velocity = JUMP_SPEED * (jump_up + jump_angle)
 			state = STATE_JUMP
 		elif state == STATE_JUMP and Input.is_action_pressed("jump"):
 			velocity.y += -JUMP_HOLD_SPEED * delta

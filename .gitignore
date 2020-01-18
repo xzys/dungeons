@@ -4,3 +4,5 @@ export_presets.cfg
 .mono/
 data_*/
 *.tmp
+.DS_Store
+*.swp
