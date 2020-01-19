@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://tiles/base.tres" type="TileSet" id=1]
 [ext_resource path="res://tiles/mininicular.png" type="Texture" id=2]
-[ext_resource path="res://player/player.tscn" type="PackedScene" id=3]
-[ext_resource path="res://npc/npc.tscn" type="PackedScene" id=4]
+[ext_resource path="res://tiles/cave_gen.gd" type="Script" id=3]
+[ext_resource path="res://player/player.tscn" type="PackedScene" id=4]
+[ext_resource path="res://npc/npc.tscn" type="PackedScene" id=5]
 
 [sub_resource type="TileSet" id=1]
 0/name = "mininicular.png 0"
@@ -630,6 +631,7 @@
 [node name="Node2D" type="Node2D"]
 
 [node name="TileMap" type="TileMap" parent="."]
+visible = false
 scale = Vector2( 0.5, 0.5 )
 tile_set = ExtResource( 1 )
 collision_use_kinematic = true
@@ -644,10 +646,21 @@ cell_size = Vector2( 16, 16 )
 format = 1
 tile_data = PoolIntArray( 524311, 52, 0, 589847, 33, 0, 589848, 47, 0, 655383, 33, 0, 655384, 30, 0, 720919, 35, 0, 720920, 36, 0, 786454, 50, 0, 786455, 31, 0, 786456, 30, 0, 851990, 29, 0, 851991, 61, 0, 851992, 44, 0, 917525, 41, 0, 917526, 61, 0, 917527, 44, 0, 917528, 47, 0, 983060, 41, 0, 983061, 61, 0, 983062, 34, 0 )
 
-[node name="player" parent="." instance=ExtResource( 3 )]
+[node name="TileMap3" type="TileMap" parent="."]
+scale = Vector2( 0.5, 0.5 )
+tile_set = ExtResource( 1 )
+collision_use_kinematic = true
+collision_mask = 31
+format = 1
+tile_data = PoolIntArray( -1179676, 0, 0, -720924, 0, 0 )
+script = ExtResource( 3 )
+
+[node name="player" parent="." instance=ExtResource( 4 )]
+visible = false
 position = Vector2( 149.657, 162.43 )
 collision_layer = 2
 
-[node name="skeleton" parent="." instance=ExtResource( 4 )]
+[node name="skeleton" parent="." instance=ExtResource( 5 )]
+visible = false
 position = Vector2( 470.087, 208.083 )
 collision_layer = 4
