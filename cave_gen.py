@@ -119,45 +119,12 @@ def gen_cave(params):
     print_cave(tiles)
 
 
-# these are tileset edges
 """
-tileset = [
-    # corner
-    (1, 0, 0, 0, 0, 0, 0, 1),
-    # angle
-    (1, 1, 0, 0, 0, 0, 0, 1),
-    # diagonal
-    (1, 1, 0, 0, 0, 0, 1, 1),
-    # angle-inv
-    (1, 1, 1, 0, 0, 0, 1, 1),
-    # half
-    (1, 1, 1, 0, 0, 0, 0, 1),
-    # corner-inv
-    (1, 1, 1, 0, 0, 1, 1, 1),
-    ]
-tileset = [
-    (tt+offset for tt in t)
-    for t in tileset
-    for offset in range(0, 8, 2)]
-tileset += [
-    # empty
-    (0, 0, 0, 0, 0, 0, 0, 0),
-    # full
-    (1, 1, 1, 1, 1, 1, 1, 1),
-    ]
-            a = (
-                f(y-1, x), f(y-1, x+1),
-                f(y, x+2), f(y+1, x+2),
-                f(y+2, x), f(y+2, x+1),
-                f(y, x-1), f(y+1, x-1),
-            )
-"""
+# rotate cell n times
 def rotate_cell(c, n):
-    """rotate cell n times"""
     for i in range(n):
         c = (c[6], c[3], c[0], c[7], c[4], c[1], c[8], c[5], c[2])
     return c
-
 tileset = [
     # corner
     (1, 0, 0, 0, 0, 0, 0, 0, 0),
@@ -176,34 +143,21 @@ tileset = [
     rotate_cell(cell, rotation)
     for cell in tileset
     for rotation in range(4)]
-"""
 tileset += [
     # full
     (1, 1, 1, 1, 1, 1, 1, 1, 1),
     ]
 """
+tileset = [
+    (0, 0, 0, 0): 0,
+    (0, 0, 0, 0): 0,
+]
 def assign_tiles(params, tiles):
     f = lambda y, x: tiles[y][x] if in_range(params, x, y) else 1
 
-    """
-    for x in range(0, params.width, 2):
-        for y in range(0, params.height, 2):
-            a = [
-                f(y, x), f(y, x+1), f(y, x+2),
-                f(y+1, x), f(y+1, x+1), f(y+1, x+2),
-                f(y+2, x), f(y+2, x+1), f(y+2, x+2),
-            ]
-            for c in tileset:
-                if a == c and c != tileset[-1]:
-                    print(x, y, c)
-    """
-
     for x in range(params.width):
         for y in range(params.height):
-            a = tuple(
-                f(y+dy, x+dy)
-                for dy in range(-1, 2) for dx in range(-1, 2)
-            )
+            a = tuple()
             for i, c in enumerate(tileset):
                 if a == c:
                     tiles[y][x] = i
