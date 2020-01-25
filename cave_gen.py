@@ -16,10 +16,14 @@ disp_map = {
     1: '##',
     2: 'xx',
     }
-def print_cave(tiles):
+def print_cave(tiles, raw=False):
     for row in tiles:
         for t in row:
-            c = disp_map[t] if t in disp_map else '{:<2}'.format(t)
+            c = None
+            if raw:
+                c = '{:>2}'.format(t)
+            else:
+                c = disp_map[t] if t in disp_map else '{:<2}'.format(t)
             print(c, end='')
         print()
     print()
@@ -115,52 +119,49 @@ def gen_cave(params):
             tiles[y][x] = 1
 
     print_cave(tiles)
-    assign_tiles(params, tiles)
-    print_cave(tiles)
+    assigned = assign_tiles(params, tiles)
+    print_cave(assigned, raw=True)
 
 
-"""
-# rotate cell n times
-def rotate_cell(c, n):
-    for i in range(n):
-        c = (c[6], c[3], c[0], c[7], c[4], c[1], c[8], c[5], c[2])
-    return c
-tileset = [
-    # corner
-    (1, 0, 0, 0, 0, 0, 0, 0, 0),
-    # angle
-    (1, 1, 1, 1, 0, 0, 0, 0, 0),
-    # diagonal
-    (1, 1, 1, 1, 1, 0, 1, 0, 0),
-    # angle-inv
-    (1, 1, 1, 1, 1, 1, 1, 0, 0),
-    # half
-    (1, 1, 1, 1, 1, 1, 0, 0, 0),
-    # corner-inv
-    (0, 1, 1, 1, 1, 1, 1, 1, 1),
-    ]
-tileset = [
-    rotate_cell(cell, rotation)
-    for cell in tileset
-    for rotation in range(4)]
-tileset += [
-    # full
-    (1, 1, 1, 1, 1, 1, 1, 1, 1),
-    ]
-"""
-tileset = [
-    (0, 0, 0, 0): 0,
-    (0, 0, 0, 0): 0,
-]
+tilemap = {
+        'e': -1,
+        'f': 0,
+        'tl': 1,
+        'tr': 2,
+        'bl': 3,
+        'br': 4,
+        }
+tileset = {
+        (0, 0, 0, 0): ('e', 'e', 'e', 'e'),
+        (1, 1, 1, 1): ('f', 'f', 'f', 'f'),
+        (1, 0, 0, 0): ('tl', 'e', 'e', 'e'),
+        (0, 1, 0, 0): ('e', 'tr', 'e', 'e'),
+        (0, 0, 1, 0): ('e', 'e', 'br', 'e'),
+        (0, 0, 0, 1): ('e', 'e', 'e', 'bl'),
+        (1, 1, 0, 0): ('f', 'f', 'e', 'e'),
+        (0, 1, 1, 0): ('e', 'f', 'f', 'e'),
+        (0, 0, 1, 1): ('e', 'e', 'f', 'f'),
+        (1, 0, 0, 1): ('f', 'e', 'e', 'f'),
+        (0, 1, 1, 1): ('br', 'f', 'f', 'f'),
+        (1, 0, 1, 1): ('f', 'bl', 'f', 'f'),
+        (1, 1, 0, 1): ('f', 'f', 'tl', 'f'),
+        (1, 1, 1, 0): ('f', 'f', 'f', 'tr'),
+        (1, 0, 1, 0): ('f', 'bl', 'f', 'tr'),
+        (0, 1, 0, 1): ('f', 'f', 'f', 'f'),
+        }
 def assign_tiles(params, tiles):
     f = lambda y, x: tiles[y][x] if in_range(params, x, y) else 1
-
-    for x in range(params.width):
-        for y in range(params.height):
-            a = tuple()
-            for i, c in enumerate(tileset):
-                if a == c:
-                    tiles[y][x] = i
+    new_tiles = clone_tiles(tiles) 
+    
+    for x in range(0, params.width, 2):
+        for y in range(0, params.height, 2):
+            a = (tiles[y][x], tiles[y][x+1], tiles[y+1][x+1], tiles[y+1][x])
+            xs = tileset[a]
+            new_tiles[y][x] = tilemap[xs[0]]
+            new_tiles[y][x+1] = tilemap[xs[1]]
+            new_tiles[y+1][x+1] = tilemap[xs[2]]
+            new_tiles[y+1][x] = tilemap[xs[3]]
+    return new_tiles
             
 
 if __name__ == '__main__':
