@@ -100,29 +100,6 @@ def fill_edges(params, tiles, n):
         for y in range(params.height - i*2):
             tiles[y+i][params.width - 1 - i] = 1
 
-def gen_cave(params):
-    tiles = [
-        [1 if random.random() <= params.fill_chance else 0
-            for y in range(params.width)]
-        for x in range(params.height)]
-
-    for i in range(5):
-        tiles = step_cells(params, tiles, lambda c: c >= 5 or c < 2)
-    fill_edges(params, tiles, 2)
-    for i in range(3):
-        tiles = step_cells(params, tiles, lambda c: c >= 4)
-
-    sections = find_sections(params, tiles)
-    sections = sorted(sections, key=len, reverse=True)
-    for sec in sections[1:]:
-        for y, x in sec:
-            tiles[y][x] = 1
-
-    print_cave(tiles)
-    assigned = assign_tiles(params, tiles)
-    print_cave(assigned, raw=True)
-
-
 tilemap = {
         'e': -1,
         'f': 0,
@@ -163,6 +140,29 @@ def assign_tiles(params, tiles):
             new_tiles[y+1][x] = tilemap[xs[3]]
     return new_tiles
             
+
+def gen_cave(params):
+    tiles = [
+        [1 if random.random() <= params.fill_chance else 0
+            for y in range(params.width)]
+        for x in range(params.height)]
+
+    for i in range(5):
+        tiles = step_cells(params, tiles, lambda c: c >= 5 or c < 2)
+    fill_edges(params, tiles, 2)
+    for i in range(4):
+        tiles = step_cells(params, tiles, lambda c: c >= 4)
+
+    sections = find_sections(params, tiles)
+    sections = sorted(sections, key=len, reverse=True)
+    for sec in sections[1:]:
+        for y, x in sec:
+            tiles[y][x] = 1
+
+    print_cave(tiles)
+    # assigned = assign_tiles(params, tiles)
+    # print_cave(assigned, raw=True)
+
 
 if __name__ == '__main__':
     c = gen_cave(CaveParams(

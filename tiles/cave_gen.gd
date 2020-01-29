@@ -7,20 +7,6 @@ export (float) var fill_chance = 0.45
 func _ready():
     generate_cave()
 
-var disp_map = {
-    0: '..',
-    1: '##',
-    2: 'xx',
-    }
-func print_cave(tiles):
-    var s = ''
-    for row in tiles:
-        for t in row:
-             s += disp_map[t]
-        s += '\n'
-    print(s)
-
-
 func clone_tiles(tiles):
     var new_tiles = []
     for i in range(tiles.size()):
@@ -100,6 +86,52 @@ func fill_edges(tiles, n):
         for y in range(map_height - i*2):
             tiles[y+i][map_width - 1 - i] = 1
 
+
+var tilemap = {
+    'e': -1,
+    'f': 0,
+    'tl': 18,
+    'tr': 17,
+    'br': 15,
+    'bl': 16,
+    }
+var tileset = {
+    [0, 0, 0, 0]: ['e', 'e', 'e', 'e'],
+    [1, 1, 1, 1]: ['f', 'f', 'f', 'f'],
+    [1, 0, 0, 0]: ['tl', 'e', 'e', 'e'],
+    [0, 1, 0, 0]: ['e', 'tr', 'e', 'e'],
+    [0, 0, 1, 0]: ['e', 'e', 'br', 'e'],
+    [0, 0, 0, 1]: ['e', 'e', 'e', 'bl'],
+    [1, 1, 0, 0]: ['f', 'f', 'e', 'e'],
+    [0, 1, 1, 0]: ['e', 'f', 'f', 'e'],
+    [0, 0, 1, 1]: ['e', 'e', 'f', 'f'],
+    [1, 0, 0, 1]: ['f', 'e', 'e', 'f'],
+    [0, 1, 1, 1]: ['br', 'f', 'f', 'f'],
+    [1, 0, 1, 1]: ['f', 'bl', 'f', 'f'],
+    [1, 1, 0, 1]: ['f', 'f', 'tl', 'f'],
+    [1, 1, 1, 0]: ['f', 'f', 'f', 'tr'],
+    [1, 0, 1, 0]: ['f', 'bl', 'f', 'tr'],
+    [0, 1, 0, 1]: ['br', 'f', 'tl', 'f'],
+    }
+func assign_tiles(tiles):
+    var new_tiles = []
+    for y in range(map_height * 2):
+        var row = []
+        for x in range(map_width * 2):
+            row.append(-1)
+        new_tiles.append(row)
+    
+    for x in range(map_width-1):
+        for y in range(map_height-1):
+            var a = [tiles[y][x], tiles[y][x+1], tiles[y+1][x+1], tiles[y+1][x]]
+            var xs = tileset[a]
+            new_tiles[y*2][x*2] = tilemap[xs[0]]
+            new_tiles[y*2][x*2+1] = tilemap[xs[1]]
+            new_tiles[y*2+1][x*2+1] = tilemap[xs[2]]
+            new_tiles[y*2+1][x*2] = tilemap[xs[3]]
+    return new_tiles
+
+
 class SizeSorter:
     static func sort(a, b):
         return a.size() < b.size()
@@ -130,3 +162,8 @@ func generate_cave():
         var sec = sections[i]
         for s in sec:
             tiles[s[0]][s[1]] = 1
+    
+    tiles = assign_tiles(tiles)
+    for y in range(map_height*2):
+        for x in range(map_width*2):
+            set_cell(x - map_width, y - map_height, tiles[y][x])
