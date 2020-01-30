@@ -16,8 +16,10 @@ func in_array(y, x, arr):
             return true
     return false
 
-func in_range(nx, ny):
-    return not (nx < 0 or nx > map_width - 1 or ny < 0 or ny > map_height - 1)
+func in_range(nx, ny, s):
+    return not (
+        nx < 0 or nx > (map_width * s) - 1 or 
+        ny < 0 or ny > (map_height * s) - 1)
 
 func count_neighbors(tiles, x, y):
     var c = 0
@@ -27,7 +29,7 @@ func count_neighbors(tiles, x, y):
                 continue
             var nx = x + dx
             var ny = y + dy
-            if not in_range(nx, ny):
+            if not in_range(nx, ny, 1):
                 continue
             if tiles[ny][nx] == 1:
                 c += 1
@@ -51,7 +53,7 @@ func flood_fill(tiles, start_y, start_x):
         for a in [[-1, 0], [1, 0], [0, -1], [0, 1]]:
             var ny = s[0] + a[0]
             var nx = s[1] + a[1]
-            if not in_range(nx, ny):
+            if not in_range(nx, ny, 1):
                 continue
             elif in_array(ny, nx, found):
                 continue 
@@ -135,22 +137,22 @@ func get_area_around(tiles, y, x):
     while grow:
         for dy in range(-i, i+1):
             for dx in range(-i, i+1):
-                if not in_range(dx+x, dy+y):
+                if not in_range(dx+x, dy+y, 2):
                     grow = false
-                elif tiles[dy+y][dx+x] == 1:
+                elif tiles[dy+y][dx+x] != -1:
                     grow = false
         if grow:
             i += 1
     return i
 
 func find_spawn(tiles):
-    for y in range(map_height):
-        for x in range(map_width):
+    var cs = cell_size.x
+    for y in range(len(tiles)):
+        for x in range(len(tiles[y])):
             var space = get_area_around(tiles, y, x)
-            print(space)
             if space > 2:
-                return Vector2(x * cell_size.x, y * cell_size.y)
-    return Vector2(0, 0)
+                return Vector2(x * cs, y * cs)
+    return Vector2(map_width * cs, map_height * cs)
 
 class SizeSorter:
     static func sort(a, b):
@@ -173,7 +175,7 @@ func generate_cave():
     for i in range(5):
         tiles = step_cells(tiles, funcref(CellRules, 'step_1'))
     fill_edges(tiles, 2)
-    for i in range(3):
+    for i in range(4):
         tiles = step_cells(tiles, funcref(CellRules, 'step_2'))
 
     var sections = find_sections(tiles)
@@ -186,5 +188,5 @@ func generate_cave():
     tiles = assign_tiles(tiles)
     for y in range(map_height*2):
         for x in range(map_width*2):
-            set_cell(x - map_width, y - map_height, tiles[y][x])
+            set_cell(x, y, tiles[y][x])
     return tiles

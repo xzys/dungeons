@@ -1,6 +1,6 @@
 extends KinematicBody2D
 
-export (int) var GRAVITY = 2000
+export (int) var GRAVITY = 1000
 export (float, 0, 1.0) var FRICTION = 0.10
 export (float, 0, 1.0) var AIR_FRICTION = 0.02
 

@@ -2,8 +2,8 @@ extends "res://common/character.gd"
 
 export (int) var SPEED = 600
 export (int) var AIR_SPEED = 250
-export (int) var JUMP_SPEED = 400
-export (int) var JUMP_HOLD_SPEED = 1000
+export (int) var JUMP_SPEED = 250
+export (int) var JUMP_HOLD_SPEED = 500
 export (float, 0, 1.0) var ACCELERATION = 0.05
 
 export (float) var MIN_RUN_ANIM_SPEED = 1
