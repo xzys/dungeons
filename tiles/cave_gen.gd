@@ -4,9 +4,6 @@ export (int) var map_width = 80
 export (int) var map_height = 60
 export (float) var fill_chance = 0.45
 
-func _ready():
-    generate_cave()
-
 func clone_tiles(tiles):
     var new_tiles = []
     for i in range(tiles.size()):
@@ -132,6 +129,29 @@ func assign_tiles(tiles):
     return new_tiles
 
 
+func get_area_around(tiles, y, x):
+    var i = 0
+    var grow = true
+    while grow:
+        for dy in range(-i, i+1):
+            for dx in range(-i, i+1):
+                if not in_range(dx+x, dy+y):
+                    grow = false
+                elif tiles[dy+y][dx+x] == 1:
+                    grow = false
+        if grow:
+            i += 1
+    return i
+
+func find_spawn(tiles):
+    for y in range(map_height):
+        for x in range(map_width):
+            var space = get_area_around(tiles, y, x)
+            print(space)
+            if space > 2:
+                return Vector2(x * cell_size.x, y * cell_size.y)
+    return Vector2(0, 0)
+
 class SizeSorter:
     static func sort(a, b):
         return a.size() < b.size()
@@ -167,3 +187,4 @@ func generate_cave():
     for y in range(map_height*2):
         for x in range(map_width*2):
             set_cell(x - map_width, y - map_height, tiles[y][x])
+    return tiles

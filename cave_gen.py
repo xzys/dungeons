@@ -139,7 +139,33 @@ def assign_tiles(params, tiles):
             new_tiles[y+1][x+1] = tilemap[xs[2]]
             new_tiles[y+1][x] = tilemap[xs[3]]
     return new_tiles
-            
+
+
+def get_area_around(params, tiles, y, x):
+    i = 0
+    grow = True
+    while grow:
+        for dy in range(-i,i+1):
+            for dx in range(-i,i+1):
+                if not in_range(params, dx+x, dy+y):
+                    grow = False
+                elif tiles[dy+y][dx+x] == 1:
+                    grow = False
+        if grow:
+            i += 1
+    return i
+
+def find_spawn(params, tiles):
+    largest = None
+    most_space = 0
+    for y in range(params.height):
+        for x in range(params.width):
+            space = get_area_around(params, tiles, y, x)
+            if space > most_space:
+                most_space = space
+                largest = (y, x)
+    return largest
+
 
 def gen_cave(params):
     tiles = [
@@ -150,7 +176,7 @@ def gen_cave(params):
     for i in range(5):
         tiles = step_cells(params, tiles, lambda c: c >= 5 or c < 2)
     fill_edges(params, tiles, 2)
-    for i in range(4):
+    for i in range(3):
         tiles = step_cells(params, tiles, lambda c: c >= 4)
 
     sections = find_sections(params, tiles)
@@ -160,8 +186,8 @@ def gen_cave(params):
             tiles[y][x] = 1
 
     print_cave(tiles)
-    # assigned = assign_tiles(params, tiles)
-    # print_cave(assigned, raw=True)
+    largest = find_spawn(params, tiles)
+    print(largest)
 
 
 if __name__ == '__main__':
